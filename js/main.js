@@ -2,12 +2,14 @@
 const displayJugador = document.querySelector(".jugador-container");
 const displayMensaje = document.querySelector(".mensaje-container");
 const displayCajas = document.querySelector(".caja-container");
+const modal = document.querySelector(".modal-container");
 const teclado = document.querySelector(".teclado-container");
 let listaPalabras = [];
 let wordle = "";
 let filaActual = 0;
 let cajaActual = 0;
 let juegoTerminado = false;
+
 // Variables para el contador
 let contadorCall;
 let horas = `00`;
@@ -47,31 +49,9 @@ const teclas = [
   "←",
 ];
 
-/**
- * Por cada letra de la lista de teclas se genera
- * un botón para renderizar el teclado
- */
-teclas.forEach((tecla) => {
-  const botonTecla = document.createElement("button");
-  botonTecla.textContent = tecla;
-  botonTecla.setAttribute("id", tecla);
-  botonTecla.addEventListener("click", () => {
-    //console.log("Click en la tecla", tecla);
-    if (tecla === "←") {
-      quitarLetra();
-      return;
-    }
-    if (tecla === "ENTER") {
-      if (cajaActual < 5) {
-        mostrarMensaje("¡Rellena las letras que faltan!");
-        return;
-      }
-      verificarFila();
-      return;
-    }
-    ponerLetra(tecla);
-  });
-  teclado.append(botonTecla);
+window.addEventListener("DOMContentLoaded", () => {
+  iniciarWordle();
+  generarTeclado();
 });
 
 /**
@@ -117,24 +97,56 @@ const intentosFilas = [
   ["", "", "", "", ""],
 ];
 
-/**
- * Por cada elemento de la matriz de intentos por adivinar la palabra
- * se genera una caja donde se muestran las letras elegidas
- */
-intentosFilas.forEach((intentoFila, indexFila) => {
-  const elementoFila = document.createElement("div");
-  elementoFila.setAttribute("id", `intentoFila-${indexFila}`);
-  displayCajas.appendChild(elementoFila);
-  intentoFila.forEach((cajaLetra, indexCaja) => {
-    const elementoCaja = document.createElement("div");
-    elementoCaja.setAttribute(
-      "id",
-      `intentoFila-${indexFila}-posicion-${indexCaja}`
-    );
-    elementoCaja.classList.add("caja");
-    elementoFila.appendChild(elementoCaja);
+const iniciarWordle = () => {
+  displayCajas.innerHTML = "";
+  /**
+   * Por cada elemento de la matriz de intentos por adivinar la palabra
+   * se genera una caja donde se muestran las letras elegidas
+   */
+  intentosFilas.forEach((intentoFila, indexFila) => {
+    const elementoFila = document.createElement("div");
+    elementoFila.setAttribute("id", `intentoFila-${indexFila}`);
+    displayCajas.appendChild(elementoFila);
+    intentoFila.forEach((cajaLetra, indexCaja) => {
+      const elementoCaja = document.createElement("div");
+      elementoCaja.setAttribute(
+        "id",
+        `intentoFila-${indexFila}-posicion-${indexCaja}`
+      );
+      elementoCaja.classList.add("caja");
+      elementoFila.appendChild(elementoCaja);
+    });
   });
-});
+};
+
+const generarTeclado = () => {
+  /**
+   * Por cada letra de la lista de teclas se genera
+   * un botón para renderizar el teclado
+   */
+  teclas.forEach((tecla) => {
+    const botonTecla = document.createElement("button");
+    botonTecla.textContent = tecla;
+    botonTecla.setAttribute("id", tecla);
+    botonTecla.addEventListener("click", () => {
+      //console.log("Click en la tecla", tecla);
+      if (tecla === "←") {
+        quitarLetra();
+        return;
+      }
+      if (tecla === "ENTER") {
+        if (cajaActual < 5) {
+          mostrarMensaje("¡Rellena las letras que faltan!");
+          return;
+        }
+        verificarFila();
+        return;
+      }
+      ponerLetra(tecla);
+    });
+    teclado.append(botonTecla);
+  });
+};
 
 /**
  * Esta función pone una letra en la caja de la fila actual de la matriz
@@ -265,23 +277,9 @@ const resaltarCajas = () => {
 };
 
 // iniciar el juego
-const botonInicio = document.querySelector(".titulo-container button");
-botonInicio.addEventListener("click", () => {
-  displayJugador.innerHTML = "";
-  let contadorDisplay = document.getElementById("contador");
-  clearInterval(contadorCall);
-
-  // Iniciar contador en cero
-  horas = `00`;
-  minutos = `00`;
-  segundos = `00`;
-  if (!contadorDisplay) {
-    contadorDisplay = document.createElement("p");
-    contadorDisplay.setAttribute("id", "contador");
-  }
-  displayJugador.insertAdjacentElement("afterbegin", contadorDisplay);
-
-  contadorCall = setInterval(contador, 1000);
+const btnInicio = document.querySelector(".titulo-container button");
+btnInicio.addEventListener("click", () => {
+  modal.style.display = "flex";
 });
 
 const contador = () => {
@@ -306,3 +304,37 @@ const contador = () => {
 
   contadorDisplay.innerHTML = `${horas}:${minutos}:${segundos}`;
 };
+
+const btnEmpezarJuego = document.getElementById("empezar");
+btnEmpezarJuego.addEventListener("click", () => {
+  const nombre = document.querySelector(".registro input");
+  const jugador = nombre.value;
+
+  if (jugador != "") {
+    displayJugador.innerHTML = "";
+    let contadorDisplay = document.getElementById("contador");
+    clearInterval(contadorCall);
+
+    // Iniciar contador en cero
+    horas = `00`;
+    minutos = `00`;
+    segundos = `00`;
+    if (!contadorDisplay) {
+      contadorDisplay = document.createElement("p");
+      contadorDisplay.setAttribute("id", "contador");
+    }
+    displayJugador.insertAdjacentElement("afterbegin", contadorDisplay);
+
+    contadorCall = setInterval(contador, 1000);
+
+    // Bienvenida jugador
+    displayJugador.insertAdjacentHTML(
+      "afterbegin",
+      `<p>¡Mucha suerte, ${jugador}!</p>`
+    );
+
+    iniciarWordle();
+    modal.style.display = "none";
+    nombre.value = "";
+  }
+});
