@@ -7,7 +7,7 @@ body {
   background-color: #bbbdf67e;
 }
 
-.game-container {
+.juego-container {
   height: 90vh;
   display: flex;
   flex-direction: column;
@@ -15,52 +15,111 @@ body {
   align-items: center;
 }
 
-.title-container {
+.titulo-container {
   text-align: center;
   width: 100%;
   max-width: 510px;
   border-bottom: 1px solid #797a9e;
 }
 
-.tile-container {
-  width: 330px;
+.mensaje-container {
+  height: 30px;
+}
+
+.mensaje-container p {
+  background-color: aliceblue;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 0;
+}
+
+.caja-container {
+  max-width: 330px;
   margin-bottom: 30px;
 }
 
-.tile-container div {
+.caja-container div {
   display: flex;
 }
 
-.tile-container .tile {
+.caja-container .caja {
   width: 62px;
   height: 62px;
-  border: 2px solid#797a9e;
+  border: 2px solid #797a9e;
+  border-radius: 3px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 2px;
+  font-size: 28px;
 }
 
-.keyboard-container {
-  width: 510px;
+@media only screen and (max-width: 340px) and (min-width: 5px) {
+  .caja-container .caja {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+  #ENTER {
+    width: 10%;
+    min-width: 42px;
+    font-size: 0.6em;
+  }
+}
+
+.teclado-container {
+  width: 100%;
+  max-width: 510px;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
-.keyboard-container button {
-  width: 43px;
+.teclado-container button {
+  max-width: 43px;
+  width: 8%;
   height: 48px;
   border-radius: 4px;
-  border: none;
-  margin: 4px;
+  border: 1px solid;
+  margin: 3px;
 }
 
-.keyboard-container button:nth-child(11) {
-  margin-left: 30px;
+.teclado-container button:nth-child(21),
+.teclado-container button:nth-child(29) {
+  width: 12%;
+  max-width: 68px;
+  font-size: 0.7rem;
 }
 
-.keyboard-container button:nth-child(20),
-.keyboard-container button:nth-child(28) {
-  width: 68px;
+.caja.girar {
+  animation: 0.5s linear giro;
+}
+
+@keyframes giro {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+.resaltado-gris {
+  background-color: #3a3a3a !important;
+  color: #edf2f4 !important;
+  border: none !important;
+}
+.resaltado-amarillo {
+  background-color: #b59f3a !important;
+  color: #edf2f4 !important;
+  border: none !important;
+}
+.resaltado-verde {
+  background-color: #538d4e !important;
+  color: #edf2f4 !important;
+  border: none !important;
 }
