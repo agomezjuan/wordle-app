@@ -8,7 +8,6 @@ let filaActual = 0;
 let cajaActual = 0;
 let juegoTerminado = false;
 
-
 // Lista de letras del teclado
 const teclas = [
   "Q",
@@ -42,7 +41,6 @@ const teclas = [
   "←",
 ];
 
-
 /**
  * Por cada letra de la lista de teclas se genera
  * un botón para renderizar el teclado
@@ -66,14 +64,12 @@ teclas.forEach((tecla) => {
   teclado.append(botonTecla);
 });
 
-
 /**
  * Fetch para obtener la lista de palabras
  */
 fetch("../data/5.json")
   .then((response) => response.json())
   .then((palabras) => {
-
     listaPalabras = palabras.filter((palabra) => {
       const acentos = ["á", "é", "í", "ó", "ú"];
 
@@ -92,7 +88,6 @@ fetch("../data/5.json")
     console.log(error);
   });
 
-
 /**
  * Función para seleccionar una palabra aleatoria de la lista.
  * @param {*} arr
@@ -101,7 +96,6 @@ fetch("../data/5.json")
 function palabraAleatoria(arr) {
   return arr[Math.floor(arr.length * Math.random())];
 }
-
 
 // Matriz de adivinar las palabras
 const intentosFilas = [
@@ -112,7 +106,6 @@ const intentosFilas = [
   ["", "", "", "", ""],
   ["", "", "", "", ""],
 ];
-
 
 /**
  * Por cada elemento de la matriz de intentos por adivinar la palabra
@@ -133,11 +126,10 @@ intentosFilas.forEach((intentoFila, indexFila) => {
   });
 });
 
-
 /**
  * Esta función pone una letra en la caja de la fila actual de la matriz
  * de intentos por adivinar el wordle
- * @param {*} letra 
+ * @param {*} letra
  */
 const ponerLetra = (letra) => {
   if (filaActual < 6 && cajaActual < 5) {
@@ -150,7 +142,6 @@ const ponerLetra = (letra) => {
     cajaActual++;
   }
 };
-
 
 /**
  * Esta función borra la ultima letra puesta en la caja para adivinar
@@ -168,24 +159,23 @@ const quitarLetra = () => {
   }
 };
 
-
 /**
- * Esta función verifica si las letras elegidas se corresponden con 
+ * Esta función verifica si las letras elegidas se corresponden con
  * la palabra guardada en el wordle
- * @returns 
+ * @returns
  */
 const verificarFila = () => {
   if (cajaActual > 4) {
     const adivinaUsuario = intentosFilas[filaActual].join("");
     resaltarCajas();
     if (adivinaUsuario === wordle) {
-      mostrarMensaje("Excelente, has ganado!");
+      mostrarMensaje("Excelente, has ganado! 🎉");
       juegoTerminado = true;
       return;
     } else {
       if (filaActual >= 5) {
         juegoTerminado = true;
-        mostrarMensaje("Que pena, perdiste! :(");
+        mostrarMensaje("Que pena, perdiste! ☹");
         return;
       }
       if (filaActual < 5) {
@@ -196,11 +186,10 @@ const verificarFila = () => {
   }
 };
 
-
 /**
  * Esta función muestra un mensaje según el texto enviado por parámetro
  * y se renderiza en el contenedor correspondiente del template HTML
- * @param {*} mensaje 
+ * @param {*} mensaje
  */
 const mostrarMensaje = (mensaje) => {
   const elementoMensaje = document.createElement("p");
@@ -210,7 +199,6 @@ const mostrarMensaje = (mensaje) => {
     displayMensaje.removeChild(elementoMensaje);
   }, 2500);
 };
-
 
 /**
  * Esta función resalta las palabras con colores segun su nivel de acierto
