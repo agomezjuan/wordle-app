@@ -7,6 +7,11 @@ let wordle = "";
 let filaActual = 0;
 let cajaActual = 0;
 let juegoTerminado = false;
+// Variables para el contador
+let contadorCall;
+let horas = `00`;
+let minutos = `00`;
+let segundos = `00`;
 
 // Lista de letras del teclado
 const teclas = [
@@ -170,12 +175,17 @@ const verificarFila = () => {
     resaltarCajas();
     if (adivinaUsuario === wordle) {
       mostrarMensaje("Excelente, has ganado! 🎉");
+      clearInterval(contadorCall);
       juegoTerminado = true;
       return;
     } else {
       if (filaActual >= 5) {
-        juegoTerminado = true;
+        let contadorDisplay = document.getElementById("contador");
         mostrarMensaje("Que pena, perdiste! ☹");
+        clearInterval(contadorCall);
+        juegoTerminado = true;
+        let respuesta = `<p>El wordle era ${wordle}</p>`;
+        contadorDisplay.insertAdjacentHTML("beforeend", respuesta);
         return;
       }
       if (filaActual < 5) {
@@ -246,4 +256,45 @@ const resaltarCajas = () => {
         .classList.add(intentoAdivinar[index].color);
     }, 250 * index);
   });
+};
+
+// iniciar el juego
+const botonInicio = document.querySelector(".titulo-container button");
+botonInicio.addEventListener("click", () => {
+  clearInterval(contadorCall);
+  // contador
+  horas = `00`;
+  minutos = `00`;
+  segundos = `00`;
+  let contadorDisplay = document.getElementById("contador");
+  if (!contadorDisplay) {
+    contadorDisplay = document.createElement("div");
+    contadorDisplay.setAttribute("id", "contador");
+  }
+  displayMensaje.insertAdjacentElement("beforebegin", contadorDisplay);
+
+  contadorCall = setInterval(contador, 1000);
+});
+
+const contador = () => {
+  let contadorDisplay = document.getElementById("contador");
+  segundos++;
+
+  if (segundos < 10) segundos = `0` + segundos;
+
+  if (segundos > 59) {
+    segundos = `00`;
+    minutos++;
+
+    if (minutos < 10) minutos = `0` + minutos;
+  }
+
+  if (minutos > 59) {
+    minutos = `00`;
+    horas++;
+
+    if (horas < 10) horas = `0` + horas;
+  }
+
+  contadorDisplay.innerHTML = `<p>${horas}:${minutos}:${segundos}</p>`;
 };
