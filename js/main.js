@@ -1,16 +1,31 @@
-//import getWord from "./fetch.js";
+const displayMensaje = document.querySelector(".mensaje-container");
+const displayCajas = document.querySelector(".caja-container");
+const teclado = document.querySelector(".teclado-container");
+const listaPalabras = [];
+let wordle = "";
 
-const tablero = document.querySelector(".tile-container");
-const teclado = document.querySelector(".keyboard-container");
-
-fetch("../data/palabras.json")
+fetch("../data/5.json")
   .then((response) => response.json())
-  .then((data) => console.log(randomWord(data)))
+  .then((palabras) => {
+    const sinAcentos = palabras.filter((palabra) => {
+      const acentos = ["á", "é", "í", "ó", "ú"];
+
+      for (const letra of palabra.split("")) {
+        for (const vocal of acentos) {
+          if (letra === vocal) return false;
+        }
+      }
+      return true;
+    });
+    listaPalabras = sinAcentos;
+    wordle = palabraAleatoria(listaPalabras).toUpperCase();
+    console.log(wordle);
+  })
   .catch((error) => {
     console.log(error);
   });
 
-function randomWord(arr) {
+function palabraAleatoria(arr) {
   return arr[Math.floor(arr.length * Math.random())];
 }
 
@@ -34,6 +49,7 @@ const teclas = [
   "J",
   "K",
   "L",
+  "Ñ",
   "ENTER",
   "Z",
   "X",
@@ -42,10 +58,10 @@ const teclas = [
   "B",
   "N",
   "M",
-  "«",
+  "←",
 ];
 
-const guessRows = [
+const intentosFilas = [
   ["", "", "", "", ""],
   ["", "", "", "", ""],
   ["", "", "", "", ""],
@@ -54,21 +70,22 @@ const guessRows = [
   ["", "", "", "", ""],
 ];
 
-let currentRow = 0;
-let currentBox = 0;
+let filaActual = 0;
+let cajaActual = 0;
+let juegoTerminado = false;
 
-guessRows.forEach((guessRow, indexFila) => {
-  const rowElement = document.createElement("div");
-  rowElement.setAttribute("id", `guessRow-${indexFila}`);
-  tablero.appendChild(rowElement);
-  guessRow.forEach((caja, indexCaja) => {
-    const boxElement = document.createElement("div");
-    boxElement.setAttribute(
+intentosFilas.forEach((intentoFila, indexFila) => {
+  const elementoFila = document.createElement("div");
+  elementoFila.setAttribute("id", `intentoFila-${indexFila}`);
+  displayCajas.appendChild(elementoFila);
+  intentoFila.forEach((cajaLetra, indexCaja) => {
+    const elementoCaja = document.createElement("div");
+    elementoCaja.setAttribute(
       "id",
-      `guessRow-${indexFila}-posicion-${indexCaja}`
+      `intentoFila-${indexFila}-posicion-${indexCaja}`
     );
-    boxElement.classList.add("tile");
-    rowElement.appendChild(boxElement);
+    elementoCaja.classList.add("caja");
+    elementoFila.appendChild(elementoCaja);
   });
 });
 
@@ -76,31 +93,98 @@ teclas.forEach((tecla) => {
   const botonTecla = document.createElement("button");
   botonTecla.textContent = tecla;
   botonTecla.setAttribute("id", tecla);
-  botonTecla.addEventListener("click", () => handleClick(tecla));
+  botonTecla.addEventListener("click", () => {
+    console.log("Clickie", tecla);
+    if (tecla === "←") {
+      quitarLetra();
+      return;
+    }
+    if (tecla === "ENTER") {
+      verificarFila();
+      return;
+    }
+    ponerLetra(tecla);
+  });
   teclado.append(botonTecla);
 });
 
-const handleClick = (tecla) => {
-  console.log("Clickie", tecla);
-  if (tecla === "«") {
-    console.log("Borrar");
-    return;
+const ponerLetra = (letra) => {
+  if (filaActual < 6 && cajaActual < 5) {
+    const caja = document.getElementById(
+      `intentoFila-${filaActual}-posicion-${cajaActual}`
+    );
+    caja.innerText = letra;
+    caja.setAttribute("data", letra);
+    intentosFilas[filaActual][cajaActual] = letra;
+    cajaActual++;
   }
-  if (tecla === "ENTER") {
-    console.log("Enter");
-    return;
-  }
-  addLetter(tecla);
 };
 
-const addLetter = (letter) => {
-  const box = document.getElementById(
-    `guessRow-${currentRow}-posicion-${currentBox}`
-  );
-  console.log("Fila", currentRow);
-  console.log("Caja", currentBox);
-  box.innerText = letter;
-  guessRows[currentRow][currentBox];
-  currentBox++;
-  console.log(guessRows);
+const quitarLetra = () => {
+  if (cajaActual > 0) {
+    cajaActual--;
+    const caja = document.getElementById(
+      `intentoFila-${filaActual}-posicion-${cajaActual}`
+    );
+    caja.innerText = "";
+    caja.setAttribute("data", "");
+    intentosFilas[filaActual][cajaActual] = "";
+  }
+};
+
+const verificarFila = () => {
+  if (cajaActual > 4) {
+    const adivinaUsuario = intentosFilas[filaActual].join("");
+    resaltarCajas();
+    if (adivinaUsuario === wordle) {
+      mostrarMensaje("Excelente, has ganado!");
+      juegoTerminado = true;
+      return;
+    } else {
+      if (filaActual >= 5) {
+        juegoTerminado = false;
+        return;
+      }
+      if (filaActual < 5) {
+        filaActual++;
+        cajaActual = 0;
+      }
+    }
+  }
+};
+
+const mostrarMensaje = (mensaje) => {
+  const elementoMensaje = document.createElement("p");
+  elementoMensaje.innerText = mensaje;
+  displayMensaje.append(elementoMensaje);
+  setTimeout(() => {
+    displayMensaje.removeChild(elementoMensaje);
+  }, 2000);
+};
+
+const resaltarCajas = () => {
+  const cajasDeFila = document.getElementById(
+    `intentoFila-${filaActual}`
+  ).childNodes;
+
+  let verificarWordle = wordle;
+  const intentos = [];
+
+  cajasDeFila.forEach((caja, index) => {
+    const dataLetra = caja.getAttribute("data");
+
+    setTimeout(() => {
+      caja.classList.add("girar");
+      if (dataLetra == wordle[index]) {
+        caja.classList.add("resaltado-verde");
+        document.getElementById(dataLetra).classList.add("resaltado-verde");
+      } else if (wordle.split("").includes(dataLetra)) {
+        caja.classList.add("resaltado-amarillo");
+        document.getElementById(dataLetra).classList.add("resaltado-amarillo");
+      } else {
+        caja.classList.add("resaltado-gris");
+        document.getElementById(dataLetra).classList.add("resaltado-gris");
+      }
+    }, 500 * index);
+  });
 };
