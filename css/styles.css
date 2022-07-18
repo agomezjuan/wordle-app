@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "Digital";
+  src: url("../fonts/Seven\ Segment.ttf");
+}
+
 * {
   color: #625f63;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -31,8 +36,21 @@ body {
   cursor: pointer;
 }
 
+.jugador-container {
+  min-height: 3rem;
+  text-align: center;
+}
+
+#contador {
+  font-family: "Digital", sans-serif;
+  font-size: 42px;
+  font-weight: 500;
+  margin: 5px;
+}
+
 .mensaje-container {
   height: 30px;
+  margin: 10px;
 }
 
 .mensaje-container p {
@@ -95,11 +113,15 @@ body {
   margin: 3px;
 }
 
-.teclado-container button:nth-child(21),
+.teclado-container button:nth-child(21) {
+  width: 15%;
+  max-width: 68px;
+  font-size: 0.7rem;
+}
+
 .teclado-container button:nth-child(29) {
   width: 12%;
   max-width: 68px;
-  font-size: 0.7rem;
 }
 
 .caja.girar {
@@ -108,13 +130,13 @@ body {
 
 @keyframes giro {
   0% {
-    transform: rotateY(0deg);
+    transform: rotateX(0deg);
   }
   50% {
-    transform: rotateY(90deg);
+    transform: rotateX(90deg);
   }
   100% {
-    transform: rotateY(0deg);
+    transform: rotateX(0deg);
   }
 }
 
@@ -132,4 +154,16 @@ body {
   background-color: #538d4e !important;
   color: #edf2f4 !important;
   border: none !important;
+}
+
+.modal-container {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vh;
+  height: 100vh;
+  background-color: #538d4ea5;
 }

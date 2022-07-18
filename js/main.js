@@ -1,4 +1,5 @@
 // Selectores del DOM y variables globales del wordle
+const displayJugador = document.querySelector(".jugador-container");
 const displayMensaje = document.querySelector(".mensaje-container");
 const displayCajas = document.querySelector(".caja-container");
 const teclado = document.querySelector(".teclado-container");
@@ -61,6 +62,10 @@ teclas.forEach((tecla) => {
       return;
     }
     if (tecla === "ENTER") {
+      if (cajaActual < 5) {
+        mostrarMensaje("¡Rellena las letras que faltan!");
+        return;
+      }
       verificarFila();
       return;
     }
@@ -181,11 +186,11 @@ const verificarFila = () => {
     } else {
       if (filaActual >= 5) {
         let contadorDisplay = document.getElementById("contador");
-        mostrarMensaje("Que pena, perdiste! ☹");
+        mostrarMensaje("Que pena, perdiste! 😞");
         clearInterval(contadorCall);
         juegoTerminado = true;
         let respuesta = `<p>El wordle era ${wordle}</p>`;
-        contadorDisplay.insertAdjacentHTML("beforeend", respuesta);
+        displayJugador.insertAdjacentHTML("beforeend", respuesta);
         return;
       }
       if (filaActual < 5) {
@@ -202,6 +207,7 @@ const verificarFila = () => {
  * @param {*} mensaje
  */
 const mostrarMensaje = (mensaje) => {
+  displayMensaje.innerHTML = "";
   const elementoMensaje = document.createElement("p");
   elementoMensaje.innerText = mensaje;
   displayMensaje.append(elementoMensaje);
@@ -261,17 +267,19 @@ const resaltarCajas = () => {
 // iniciar el juego
 const botonInicio = document.querySelector(".titulo-container button");
 botonInicio.addEventListener("click", () => {
+  displayJugador.innerHTML = "";
+  let contadorDisplay = document.getElementById("contador");
   clearInterval(contadorCall);
-  // contador
+
+  // Iniciar contador en cero
   horas = `00`;
   minutos = `00`;
   segundos = `00`;
-  let contadorDisplay = document.getElementById("contador");
   if (!contadorDisplay) {
-    contadorDisplay = document.createElement("div");
+    contadorDisplay = document.createElement("p");
     contadorDisplay.setAttribute("id", "contador");
   }
-  displayMensaje.insertAdjacentElement("beforebegin", contadorDisplay);
+  displayJugador.insertAdjacentElement("afterbegin", contadorDisplay);
 
   contadorCall = setInterval(contador, 1000);
 });
@@ -296,5 +304,5 @@ const contador = () => {
     if (horas < 10) horas = `0` + horas;
   }
 
-  contadorDisplay.innerHTML = `<p>${horas}:${minutos}:${segundos}</p>`;
+  contadorDisplay.innerHTML = `${horas}:${minutos}:${segundos}`;
 };
