@@ -58,7 +58,7 @@ window.addEventListener("DOMContentLoaded", () => {
  * Fetch para obtener la lista de palabras
  */
 
-fetch("../data/20.json")
+fetch("https://agomezjuan.github.io/wordle-app/data/5.json")
   .then((response) => response.json())
   .then((palabras) => {
     listaPalabras = palabras.filter((palabra) => {
