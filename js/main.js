@@ -78,7 +78,9 @@ const teclas = [
 //   });
 async function obtenerPalabra() {
   try {
-    const response = await fetch("../data/5.json");
+    const response = await fetch(
+      "https://agomezjuan.github.io/wordle-app/data/5.json"
+    );
     const data = await response.json();
     const palabras = data.filter((palabra) => {
       const acentos = ["á", "é", "í", "ó", "ú"];
@@ -344,7 +346,7 @@ btnJugar.addEventListener("click", () => {
     horas = `00`;
     minutos = `00`;
     segundos = `00`;
-    contadorCall = setTimeout(contador, 1000);
+    contadorCall = setInterval(contador, 1000);
     displayMensaje.innerHTML = "";
     if (displayJugador.childNodes.length == 3) {
       displayJugador.removeChild(displayJugador.lastChild());
