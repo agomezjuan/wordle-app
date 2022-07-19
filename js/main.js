@@ -57,8 +57,8 @@ window.addEventListener("DOMContentLoaded", () => {
 /**
  * Fetch para obtener la lista de palabras
  */
-//fetch("../data/5.json")
-fetch("https://wordle.danielfrg.com/words/5.json")
+
+fetch("../data/20.json")
   .then((response) => response.json())
   .then((palabras) => {
     listaPalabras = palabras.filter((palabra) => {
@@ -72,7 +72,6 @@ fetch("https://wordle.danielfrg.com/words/5.json")
       return true;
     });
 
-    console.log(listaPalabras);
     wordle = palabraAleatoria(listaPalabras).toUpperCase();
     console.log(wordle);
   })
