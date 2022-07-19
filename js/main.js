@@ -4,6 +4,11 @@ const displayMensaje = document.querySelector(".mensaje-container");
 const displayCajas = document.querySelector(".caja-container");
 const modal = document.querySelector(".modal-container");
 const teclado = document.querySelector(".teclado-container");
+let jugador = {
+  name: "",
+  tablero: [],
+  estadisticas: { aciertos: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, fallas: 0 } },
+};
 let listaPalabras = [];
 let wordle = "";
 let filaActual = 0;
@@ -49,19 +54,33 @@ const teclas = [
   "←",
 ];
 
-window.addEventListener("DOMContentLoaded", () => {
-  iniciarWordle();
-  generarTeclado();
-});
-
 /**
  * Fetch para obtener la lista de palabras
  */
-//fetch("../data/5.json")
-fetch("https://wordle.danielfrg.com/words/5.json")
-  .then((response) => response.json())
-  .then((palabras) => {
-    listaPalabras = palabras.filter((palabra) => {
+// fetch("https://agomezjuan.github.io/wordle-app/data/5.json")
+//   .then((response) => response.json())
+//   .then((palabras) => {
+//     listaPalabras = palabras.filter((palabra) => {
+//       const acentos = ["á", "é", "í", "ó", "ú"];
+
+//       for (const letra of palabra.split("")) {
+//         for (const vocal of acentos) {
+//           if (letra === vocal) return false;
+//         }
+//       }
+//       return true;
+//     });
+
+//     wordle = palabraAleatoria(listaPalabras).toUpperCase();
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
+async function obtenerPalabra() {
+  try {
+    const response = await fetch("../data/5.json");
+    const data = await response.json();
+    const palabras = data.filter((palabra) => {
       const acentos = ["á", "é", "í", "ó", "ú"];
 
       for (const letra of palabra.split("")) {
@@ -71,14 +90,12 @@ fetch("https://wordle.danielfrg.com/words/5.json")
       }
       return true;
     });
-
-    console.log(listaPalabras);
-    wordle = palabraAleatoria(listaPalabras).toUpperCase();
-    console.log(wordle);
-  })
-  .catch((error) => {
+    let palabra = palabraAleatoria(palabras).toUpperCase();
+    return palabra;
+  } catch (error) {
     console.log(error);
-  });
+  }
+}
 
 /**
  * Función para seleccionar una palabra aleatoria de la lista.
@@ -99,12 +116,13 @@ const intentosFilas = [
   ["", "", "", "", ""],
 ];
 
+/**
+ * Por cada elemento de la matriz de intentos por adivinar la palabra
+ * se genera una caja donde se muestran las letras elegidas.
+ */
 const iniciarWordle = () => {
   displayCajas.innerHTML = "";
-  /**
-   * Por cada elemento de la matriz de intentos por adivinar la palabra
-   * se genera una caja donde se muestran las letras elegidas
-   */
+
   intentosFilas.forEach((intentoFila, indexFila) => {
     const elementoFila = document.createElement("div");
     elementoFila.setAttribute("id", `intentoFila-${indexFila}`);
@@ -121,17 +139,21 @@ const iniciarWordle = () => {
   });
 };
 
-const generarTeclado = () => {
-  /**
-   * Por cada letra de la lista de teclas se genera
-   * un botón para renderizar el teclado
-   */
+/**
+ * Por cada letra de la lista de teclas se genera
+ * un botón para renderizar el teclado.
+ */
+const generarTeclado = (habilitado = false) => {
+  teclado.innerHTML = "";
+
   teclas.forEach((tecla) => {
     const botonTecla = document.createElement("button");
     botonTecla.textContent = tecla;
     botonTecla.setAttribute("id", tecla);
+    if (!habilitado) {
+      botonTecla.setAttribute("disabled", "");
+    }
     botonTecla.addEventListener("click", () => {
-      //console.log("Click en la tecla", tecla);
       if (tecla === "←") {
         quitarLetra();
         return;
@@ -191,16 +213,18 @@ const quitarLetra = () => {
 const verificarFila = () => {
   if (cajaActual > 4) {
     const adivinaUsuario = intentosFilas[filaActual].join("");
+    jugador.tablero.push(adivinaUsuario);
+    console.log(jugador.tablero);
     resaltarCajas();
     if (adivinaUsuario === wordle) {
-      mostrarMensaje("Excelente, has ganado! 🎉");
+      mostrarMensaje("Excelente, has ganado! 🎉", true);
       clearInterval(contadorCall);
       juegoTerminado = true;
       return;
     } else {
       if (filaActual >= 5) {
         let contadorDisplay = document.getElementById("contador");
-        mostrarMensaje("Que pena, perdiste! 😞");
+        mostrarMensaje("Que pena, perdiste! 😞", true);
         clearInterval(contadorCall);
         juegoTerminado = true;
         let respuesta = `<p>El wordle era ${wordle}</p>`;
@@ -220,14 +244,17 @@ const verificarFila = () => {
  * y se renderiza en el contenedor correspondiente del template HTML
  * @param {*} mensaje
  */
-const mostrarMensaje = (mensaje) => {
+const mostrarMensaje = (mensaje, permanente = false) => {
   displayMensaje.innerHTML = "";
   const elementoMensaje = document.createElement("p");
   elementoMensaje.innerText = mensaje;
   displayMensaje.append(elementoMensaje);
-  setTimeout(() => {
-    displayMensaje.removeChild(elementoMensaje);
-  }, 2500);
+
+  if (!permanente) {
+    setTimeout(() => {
+      displayMensaje.removeChild(elementoMensaje);
+    }, 2500);
+  }
 };
 
 /**
@@ -278,14 +305,11 @@ const resaltarCajas = () => {
   });
 };
 
-// iniciar el juego
-const btnInicio = document.querySelector(".titulo-container button");
-btnInicio.addEventListener("click", () => {
-  modal.style.display = "flex";
-});
-
+/**
+ * Contador que muestra el tiempo desde que empezó el juego
+ */
 const contador = () => {
-  let contadorDisplay = document.getElementById("contador");
+  const contadorDisplay = document.getElementById("contador");
   segundos++;
 
   if (segundos < 10) segundos = `0` + segundos;
@@ -307,12 +331,36 @@ const contador = () => {
   contadorDisplay.innerHTML = `${horas}:${minutos}:${segundos}`;
 };
 
+/* ----------------- Eventos ------------------ */
+
+// Botón Jugar
+const btnJugar = document.querySelector(".titulo-container button");
+btnJugar.addEventListener("click", () => {
+  if (jugador.name == "") {
+    modal.style.display = "flex";
+  } else {
+    clearInterval(contadorCall);
+    // Iniciar contador en cero
+    horas = `00`;
+    minutos = `00`;
+    segundos = `00`;
+    contadorCall = setTimeout(contador, 1000);
+    displayMensaje.innerHTML = "";
+    if (displayJugador.childNodes.length == 3) {
+      displayJugador.removeChild(displayJugador.lastChild());
+    }
+    iniciarWordle();
+    generarTeclado(true);
+  }
+});
+
+// Botón Empezar Juego (despues de ecribir eel nombre)
 const btnEmpezarJuego = document.getElementById("empezar");
 btnEmpezarJuego.addEventListener("click", () => {
   const nombre = document.querySelector(".registro input");
-  const jugador = nombre.value;
+  jugador.name = nombre.value;
 
-  if (jugador != "") {
+  if (jugador.name != "") {
     displayJugador.innerHTML = "";
     let contadorDisplay = document.getElementById("contador");
     clearInterval(contadorCall);
@@ -332,11 +380,26 @@ btnEmpezarJuego.addEventListener("click", () => {
     // Bienvenida jugador
     displayJugador.insertAdjacentHTML(
       "afterbegin",
-      `<p>¡Mucha suerte, ${jugador}!</p>`
+      `<p>¡Mucha suerte, ${jugador.name}!</p>`
     );
 
-    iniciarWordle();
+    // iniciarWordle();
+    generarTeclado(true);
     modal.style.display = "none";
     nombre.value = "";
   }
 });
+
+window.addEventListener("DOMContentLoaded", async () => {
+  wordle = await obtenerPalabra();
+  iniciarWordle();
+  generarTeclado();
+});
+
+/**
+ * {
+ *    nombre: "Alberto",
+ *    talero: [],
+ *    estadisticas: {aciertos: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, fallas: 0}}
+ * }
+ */
