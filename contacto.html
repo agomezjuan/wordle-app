@@ -10,7 +10,11 @@
   </head>
   <body>
     <div class="formulario">
-      <form action="mailto:yomismo@mail.com">
+      <form
+        action="mailto:yomismo@mail.com"
+        method="post"
+        enctype="multipart/form-data"
+      >
         <div class="form-block">
           <label for="nombre">Nombre: </label>
           <input type="text" name="" id="nombre" required />
@@ -21,17 +25,13 @@
         </div>
         <div class="form-block">
           <label for="mensaje">Mensaje: </label>
-          <textarea
-            name=""
-            id="mensaje"
-            cols="10"
-            rows="10"
-            required
-          ></textarea>
+          <textarea name="" id="mensaje" cols="10" rows="5" required></textarea>
         </div>
         <input type="submit" value="Enviar" />
         <a href="index.html" role="button" id="volver">Cacelar</a>
       </form>
     </div>
+
+    <script src="./js/contacto.js"></script>
   </body>
 </html>

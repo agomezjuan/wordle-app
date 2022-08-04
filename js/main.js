@@ -382,9 +382,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 const guardarJuego = (jugador) => {
-  let juegosGuardados = localStorage.getItem("juegosGuardados")
-    ? JSON.parse(localStorage.getItem("juegosGuardados"))
-    : [];
+  let juegosGuardados;
+  if (localStorage.getItem("juegosGuardados")) {
+    juegosGuardados = JSON.parse(localStorage.getItem("juegosGuardados"));
+  } else {
+    juegosGuardados = [];
+  }
+
+  // let juegosGuardados = localStorage.getItem("juegosGuardados")
+  //   ? JSON.parse(localStorage.getItem("juegosGuardados"))
+  //   : [];
   console.log(juegosGuardados);
   if (juegoTerminado) {
     mostrarMensaje("Este juego no se puede guardar porque ya ha terminado.");
@@ -444,10 +451,16 @@ function renderJuegosGuardados(juegosGuardados) {
   juegosGuardados.forEach((juego) => {
     const p = document.createElement("p");
     p.classList.add("juego-guardado");
-    p.innerHTML = `${juego.nombre} - ${new Date(juego.fecha).toLocaleDateString(
-      "es",
-      { year: "numeric", month: "short", day: "numeric" }
-    )}<br /><span>${juego.tablero}</span>`;
+    const fecha = new Date(juego.fecha);
+    p.innerHTML = `${juego.nombre} - ${fecha.toLocaleDateString("es-LA", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })}, ${fecha.toLocaleTimeString("es-LA", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })}<br /><span>${juego.tablero}</span>`;
 
     p.addEventListener("click", () => {
       jugador = juego;
